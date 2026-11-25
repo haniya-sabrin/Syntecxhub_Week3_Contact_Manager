@@ -8,21 +8,29 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// CORS Configuration
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
 app.use(express.json());
 
-// Connect MongoDB
+// Database Connection
 connectDB();
 
-// Routes
+// Home Route
 app.get("/", (req, res) => {
   res.send("Contact Manager API is running!");
 });
 
+// Contact Routes
 app.use("/api/contacts", contactRoutes);
 
-// Start server
+// Start Server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
