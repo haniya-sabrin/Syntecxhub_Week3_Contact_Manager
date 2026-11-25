@@ -8,29 +8,36 @@ dotenv.config();
 
 const app = express();
 
-// CORS Configuration
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://contact-manager-frontend-eight.vercel.app",
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
   })
 );
 
 app.use(express.json());
 
-// Database Connection
 connectDB();
 
-// Home Route
 app.get("/", (req, res) => {
   res.send("Contact Manager API is running!");
 });
 
-// Contact Routes
 app.use("/api/contacts", contactRoutes);
 
-// Start Server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
